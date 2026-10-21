@@ -6,13 +6,12 @@ B. Sai Buvann (26010303001) · M. Sai Praneeth (26010303004)
 CNN padding, convolution and pooling, plus greyscale, normalisation and resize —
 written from scratch in C99, parallelised with OpenMP, verified and benchmarked.
 
-## 1. Read the report
+## 1. Read the reports
 
 | File | What it is |
 |---|---|
-| `reports/26010303001_Report.pdf` | Report submitted by B. Sai Buvann |
-| `reports/26010303004_Report.pdf` | Report submitted by M. Sai Praneeth |
-| `reports/REPORT.md` | The same report as Markdown, with figures in `reports/figures/` |
+| `reports/26010303001_Report.pdf` | Part 1 — padding, convolution, pooling (B. Sai Buvann) |
+| `reports/26010303004_Report.pdf` | Part 2 — greyscale, normalisation, resize (M. Sai Praneeth) |
 
 ## 2. Run it — one click
 

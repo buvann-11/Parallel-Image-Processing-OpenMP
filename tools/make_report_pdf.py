@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Render reports/REPORT.md to reports/REPORT.pdf.
+"""Markdown -> PDF renderer used by make_individual_reports.py.
+
+Run on its own it renders reports/REPORT.md to reports/REPORT.pdf.
 
 MTCS-103P High Performance Computing Laboratory -- Mini Project
 

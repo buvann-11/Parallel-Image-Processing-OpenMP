@@ -17,7 +17,7 @@ against an independent implementation, race-checked, and measured.
 | 26010303001 | B. Sai Buvann | Part 1 — padding, convolution, pooling; OpenMP strategy and false-sharing analysis; C test suite |
 | 26010303004 | M. Sai Praneeth | Part 2 — greyscale, normalisation, resize; benchmark harness and scaling study; GUI; report |
 
-📄 **Report:** [`reports/REPORT.md`](reports/REPORT.md) · PDF: [team](reports/REPORT.pdf), [26010303001](reports/26010303001_Report.pdf), [26010303004](reports/26010303004_Report.pdf)  
+📄 **Reports:** [Part 1 — CNN primitives (26010303001)](reports/26010303001_Report.pdf) · [Part 2 — image processing (26010303004)](reports/26010303004_Report.pdf)  
 ▶️ **New here?** Read [`START_HERE.md`](START_HERE.md).
 
 ![Every operation applied to a photograph](docs/screenshots/operations_gallery.png)
@@ -254,7 +254,7 @@ in §4 of the report rather than quietly kept.
 │   ├── test_cli.sh              16 end-to-end CLI / image-format checks
 │   └── tsan.supp                ThreadSanitizer suppressions (runtime only)
 ├── bench/                       strong-scaling harness and plotting
-├── reports/                     report PDFs (team + one per student), REPORT.md, figures
+├── reports/                     the two reports (PDF + Markdown) and their figures
 ├── results/                     benchmark CSVs
 ├── data/demo/, data/samples/    sample outputs, sample photograph
 ├── docs/screenshots/            README images

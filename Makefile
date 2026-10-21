@@ -197,6 +197,7 @@ figures: demo
 	fi
 
 report: figures
+	@$(PYTHON) tools/make_part_figures.py
 	@$(PYTHON) tools/make_individual_reports.py
 
 # Everything needed to refresh the report on a new machine.
@@ -205,7 +206,7 @@ results: all
 	@sh scripts/run_schedule_experiment.sh
 	@$(MAKE) --no-print-directory report
 	@echo ""
-	@echo "All results regenerated.  Update section 5 of reports/REPORT.md"
+	@echo "All results regenerated.  Update the results sections of reports/REPORT_*.md"
 	@echo "with the new numbers, then re-run 'make report'."
 
 install: $(BIN_DIR)/imgproc
