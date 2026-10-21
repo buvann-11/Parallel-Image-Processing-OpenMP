@@ -110,6 +110,20 @@ static int images_identical(const Image *a, const Image *b)
     n = image_elements(a);
     for (i = 0; i < n; ++i) {
         if (a->data[i] != b->data[i]) {
+            /* Say WHERE and by how much: "differs" alone is undebuggable
+             * when the failure only shows up on someone else's machine. */
+            size_t count = 0, j;
+            for (j = i; j < n; ++j) {
+                count += (a->data[j] != b->data[j]);
+            }
+            fprintf(stderr, "\n    first difference at element %lu "
+                    "(y=%lu x=%lu c=%lu): %.9g vs %.9g; %lu of %lu differ\n",
+                    (unsigned long)i,
+                    (unsigned long)(i / a->channels / a->width),
+                    (unsigned long)(i / a->channels % a->width),
+                    (unsigned long)(i % a->channels),
+                    a->data[i], b->data[i],
+                    (unsigned long)count, (unsigned long)n);
             return 0;
         }
     }
