@@ -53,7 +53,8 @@ ifeq ($(UNAME_S)$(CC_IS_APPLE_CLANG),Darwin1)
   ifeq ($(LIBOMP_PREFIX),)
     $(warning Apple clang needs libomp for OpenMP:  brew install libomp)
   endif
-  OPENMP_CFLAGS  := -Xpreprocessor -fopenmp -I$(LIBOMP_PREFIX)/include
+  # -isystem: Homebrew's omp.h trips -Wpedantic (C23 enum ranges); it is not our code.
+  OPENMP_CFLAGS  := -Xpreprocessor -fopenmp -isystem $(LIBOMP_PREFIX)/include
   OPENMP_LDFLAGS := -L$(LIBOMP_PREFIX)/lib -lomp
 else
   OPENMP_CFLAGS  := -fopenmp
