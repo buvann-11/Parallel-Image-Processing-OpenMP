@@ -23,7 +23,136 @@ methodology, final integration and testing.
 
 ---
 
+## Work done by each member
+
+### Work done by B. Sai Buvann (26010303001)
+
+**Role in the team:** Part 1 of the problem statement — the CNN primitives
+(padding, convolution, pooling) — together with the project's OpenMP
+parallelisation strategy and the C correctness test suite.
+
+#### 1. Padding — `src/padding.c` (240 lines)
+
+- Implemented `pad2d_serial()` and `pad2d_omp()` on NCHW tensors with all four
+  border modes used by CNN frameworks: `zeros`, `reflect`, `replicate` and
+  `circular` (§3.1).
+- Index mapping handles pads **wider than the axis itself** (repeated
+  reflection/wrap-around), a case `numpy.pad` refuses for `reflect`.
+- Parallelised with `collapse(3)` over (batch, channel, output row), so even a
+  single one-channel image yields enough independent rows for every thread.
+- Result: `pad_reflect` 2.10 ms → 0.61 ms on 2 threads (3.42×, the
+  superlinear case analysed in §5.6).
+
+#### 2. Convolution and image filtering — `src/convolution.c` (371 lines)
+
+- `conv2d_serial()` / `conv2d_omp()`: batched multi-channel `(N,C,H,W)`
+  convolution with stride, dilation and bias, cross-correlation semantics as in
+  PyTorch; `conv_output_size()` implements the output-shape arithmetic (§3.2).
+- `filter_image_serial()` / `filter_image_omp()`: depthwise filtering of an
+  image with a built-in kernel library — box, Gaussian 5×5, Sobel x/y,
+  Laplacian, sharpen, emboss.
+- Inner loop written so the compiler vectorises it; each thread owns whole
+  output rows, so no atomics or critical sections are needed.
+- Results on 2 threads: `conv_3x3` 1.99×, `conv_5x5` 2.12×,
+  `conv_cnn_16ch` 1.95× — the compute-bound group that scales near-ideally.
+
+#### 3. Pooling — `src/pooling.c` (307 lines)
+
+- `pool2d_serial()` / `pool2d_omp()`: max and average pooling with arbitrary
+  window, stride and padding (§3.3).
+- `global_avg_pool_serial()` / `global_avg_pool_omp()`: plane-wide reduction
+  with a `double` accumulator, the one kernel whose result legitimately
+  depends on summation order; its tolerance is documented and tested (§6.1).
+- Result: `pool_max_2x2` 3.57 ms → 1.53 ms on 2 threads (2.33×).
+
+#### 4. OpenMP strategy and false-sharing analysis (§4)
+
+- Defined the row-ownership rule used by every kernel in the project — each
+  parallel iteration writes exactly one output row — which removes the need
+  for atomics, critical sections and all but one barrier.
+- 64-byte-aligned buffers and cache-line-padded per-thread data, so false
+  sharing is prevented by design rather than debugged afterwards (§4.2).
+- Kept serial baselines free of OpenMP directives (no `if(0)` versions),
+  after finding that GCC's `if(0)` path inflated speedups roughly 7× (§5.6).
+
+#### 5. C correctness test suite — `tests/test_correctness.c` (1,151 lines)
+
+- 27 tests, 41,119 assertions, covering known values, mathematical
+  invariants, degenerate inputs and argument validation (§6.1).
+- The three parallel-specific tests: OpenMP output identical to serial
+  output, bit-identical output at 1/2/3/4 threads, and identical output under
+  `static`, `dynamic` and `guided` schedules.
+- This suite exposed the Apple-clang miscompilation of the histogram loop
+  investigated in §6.6.
+
+### Work done by M. Sai Praneeth (26010303004)
+
+**Role in the team:** Part 2 of the problem statement — basic image
+processing (greyscale, normalisation, resize) — together with the
+benchmark harness and scaling study, the graphical interface and the report.
+
+#### 1. Greyscale conversion — `src/grayscale.c` (187 lines)
+
+- Implemented `grayscale_serial()` and `grayscale_omp()` with four methods:
+  ITU-R BT.601, BT.709, arithmetic mean, and true relative luminance with
+  sRGB gamma linearisation (§3.4).
+- Plain greyscale is a memory-bound elementwise map (1.87× on 2 threads);
+  the gamma-correct path, with two `powf` calls per pixel, is compute-bound
+  and reaches 1.99× — the clearest illustration in the project that
+  arithmetic intensity predicts scalability (§9).
+
+#### 2. Normalisation — `src/normalize.c` (420 lines)
+
+- `normalize_serial()` / `normalize_omp()` with min–max scaling, z-score
+  standardisation and histogram equalisation (§3.5).
+- Two-phase design: a global statistic (OpenMP `min`/`max` and `+`
+  reductions; per-thread padded histograms merged after the parallel region),
+  then a parallel point transform through a 256-entry lookup table.
+- Results on 2 threads: `norm_minmax` 2.14×, `norm_equalize` 1.53× — the
+  latter limited by its genuinely serial histogram merge and LUT build, which
+  the Karp–Flatt metric confirms (§5.5).
+
+#### 3. Resize — `src/resize.c` (435 lines)
+
+- `resize_serial()` / `resize_omp()`: nearest, bilinear and bicubic
+  (Keys, *a* = −0.5) interpolation, implemented as two separable passes,
+  which cuts bicubic arithmetic by 4× (§3.6).
+- Correct anti-aliasing on downscale (kernel widened by the scale factor),
+  verified to suppress moiré; the half-pixel convention matches Pillow and
+  OpenCV.
+- Two parallel passes separated by the project's single barrier;
+  `resize_bicubic` reaches 1.57× on 2 threads.
+- Fixed the nearest-neighbour bug found by cross-validation: `float32`
+  sample positions landed on the wrong side of integer boundaries for ratios
+  such as 256/97; geometry is now computed in `double` (§6.2).
+
+#### 4. Benchmark harness and scaling study — `bench/` (445 lines of C + plotting)
+
+- `bench/benchmark.c`: strong-scaling harness with warm-up runs, best-of-N
+  timing, speedup, efficiency and the Karp–Flatt serial fraction, written to
+  `results/scaling.csv`.
+- The schedule and chunk-size experiments (§5.3–5.4), including the finding
+  that `schedule(dynamic)` with the default chunk of 1 made greyscale 100×
+  slower, and the plotting scripts that produce every figure in §5.
+
+#### 5. Graphical interface — `gui/app.py` (668 lines)
+
+- Tkinter front-end using only the Python standard library (§7).
+- **Operations** tab: load any image, choose operation, variant, thread count
+  and schedule; input and output side by side with serial time, parallel
+  time, speedup and efficiency.
+- **Test suite** tab: one click per test stage with live PASS/FAIL badges —
+  the "minimal GUI for running various tests" the assignment asks for.
+
+#### 6. Report
+
+Structure and writing of this report, the figures, and the screenshots.
+
+---
+
 ## Contents
+
+- [Team and individual contributions](#team-and-individual-contributions) · [Work done by each member](#work-done-by-each-member)
 
 1. [Objective](#1-objective)
 2. [What was built](#2-what-was-built)
