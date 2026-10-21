@@ -15,7 +15,7 @@
 #   make asan         run the tests under AddressSanitizer + UBSan
 #   make tsan         run the tests under ThreadSanitizer (data-race check)
 #   make figures      regenerate every figure from the current results
-#   make report       regenerate the figures and render report/REPORT.pdf
+#   make report       regenerate the figures and render every report PDF
 #   make results      the full pipeline: bench + experiments + figures + PDF
 #   make install      install bin/imgproc to $(PREFIX)/bin
 #   make clean        remove build artefacts
@@ -187,7 +187,7 @@ tsan: dirs
 
 # --- figures and report -----------------------------------------------------
 figures: demo
-	@mkdir -p report/figures
+	@mkdir -p reports/figures
 	@$(PYTHON) tools/make_contact_sheets.py
 	@$(PYTHON) bench/plot_results.py
 	@if [ -f results/chunk_default.csv ]; then \
@@ -197,7 +197,7 @@ figures: demo
 	fi
 
 report: figures
-	@$(PYTHON) tools/make_report_pdf.py
+	@$(PYTHON) tools/make_individual_reports.py
 
 # Everything needed to refresh the report on a new machine.
 results: all
@@ -205,7 +205,7 @@ results: all
 	@sh scripts/run_schedule_experiment.sh
 	@$(MAKE) --no-print-directory report
 	@echo ""
-	@echo "All results regenerated.  Update section 5 of report/REPORT.md"
+	@echo "All results regenerated.  Update section 5 of reports/REPORT.md"
 	@echo "with the new numbers, then re-run 'make report'."
 
 install: $(BIN_DIR)/imgproc

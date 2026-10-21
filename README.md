@@ -17,7 +17,8 @@ against an independent implementation, race-checked, and measured.
 | 26010303001 | B. Sai Buvann | Part 1 — padding, convolution, pooling; OpenMP strategy and false-sharing analysis; C test suite |
 | 26010303004 | M. Sai Praneeth | Part 2 — greyscale, normalisation, resize; benchmark harness and scaling study; GUI; report |
 
-📄 **Report:** [`report/REPORT.md`](report/REPORT.md) · [`report/REPORT.pdf`](report/REPORT.pdf)
+📄 **Report:** [`reports/REPORT.md`](reports/REPORT.md) · PDF: [team](reports/REPORT.pdf), [26010303001](reports/26010303001_Report.pdf), [26010303004](reports/26010303004_Report.pdf)  
+▶️ **New here?** Read [`START_HERE.md`](START_HERE.md).
 
 ![Every operation applied to a photograph](docs/screenshots/operations_gallery.png)
 
@@ -42,6 +43,17 @@ against an independent implementation, race-checked, and measured.
 
 ## Quick start
 
+**One click:** `RUN_LINUX_MAC.sh` (macOS / Linux) or `RUN_WINDOWS.bat` (Windows) opens a
+menu — build, verify, demo, benchmark, GUI. The same from a terminal:
+
+```bash
+python3 run_project.py all      # build + verify + demo + benchmark
+python3 run_project.py gui      # graphical front-end
+python3 verification.py         # every verification stage, one summary table
+```
+
+Or with `make`:
+
 ```bash
 make            # build everything
 make test       # C correctness suite + CLI / image-format tests
@@ -49,13 +61,9 @@ make gui        # graphical front-end
 make check      # everything CI runs: tests, NumPy verify, ASan, TSan
 ```
 
-**Linux:** any recent GCC — nothing else.
-**macOS:** `brew install libomp`, then `make` (Apple clang is detected and given the
-right OpenMP flags automatically), or `brew install gcc` and `make CC=gcc-14`.
-
-Python 3.8+ with Tkinter is needed only for the GUI; NumPy only for `make verify`;
-Matplotlib only for the figures. `make tsan` needs clang, libomp and the clang
-TSan runtime (Ubuntu: `apt install clang libomp-dev libclang-rt-dev`).
+What to install for each OS is in [`REQUIREMENTS.md`](REQUIREMENTS.md) — in short, a C
+compiler with OpenMP (Linux: GCC; macOS: `brew install libomp`; Windows: MSYS2
+MinGW-w64 GCC) and Python 3.
 
 ---
 
@@ -220,6 +228,14 @@ in §5.6 of the report rather than quietly kept.
 
 ```
 .
+├── START_HERE.md                where to begin
+├── README.md                    this file
+├── REQUIREMENTS.md              what to install, per OS
+├── RUN_LINUX_MAC.sh             one-click launcher (macOS / Linux)
+├── RUN_WINDOWS.bat              one-click launcher (Windows)
+├── run_project.py               launcher: build / verify / demo / bench / gui (no make needed)
+├── verification.py              every verification stage, one summary
+├── Makefile                     the same tasks for make users, plus sanitizers
 ├── include/imgproc.h            public API, layout and parallelisation contract
 ├── src/                         the library
 │   ├── core.c                   aligned allocation, layout conversion, timing
@@ -233,19 +249,18 @@ in §5.6 of the report rather than quietly kept.
 │   └── resize.c                 Part 2 — separable resampling with anti-aliasing
 ├── cli/main.c                   command-line driver
 ├── gui/app.py                   Tkinter front-end (operations + test runner)
-├── bench/                       strong-scaling harness and plotting
 ├── tests/
 │   ├── test_correctness.c       27 tests, 41,119 assertions
 │   ├── test_cli.sh              16 end-to-end CLI / image-format checks
 │   └── tsan.supp                ThreadSanitizer suppressions (runtime only)
-├── tools/                       NumPy cross-check, figures, PDF, screenshots
-├── reference/imgproc/           independent NumPy oracle (verification only)
-├── third_party/stb/             stb_image / stb_image_write (public domain)
-├── scripts/                     demo, gallery and experiment drivers
-├── report/                      REPORT.md, REPORT.pdf, figures
+├── bench/                       strong-scaling harness and plotting
+├── reports/                     report PDFs (team + one per student), REPORT.md, figures
 ├── results/                     benchmark CSVs
 ├── data/demo/, data/samples/    sample outputs, sample photograph
 ├── docs/screenshots/            README images
+├── reference/imgproc/           independent NumPy oracle (verification only)
+├── tools/, scripts/             report, figure, screenshot and experiment helpers
+├── third_party/stb/             stb_image / stb_image_write (public domain)
 └── .github/workflows/ci.yml     continuous integration
 ```
 

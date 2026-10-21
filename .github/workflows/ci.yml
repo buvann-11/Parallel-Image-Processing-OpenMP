@@ -39,6 +39,9 @@ jobs:
       - name: Quick benchmark
         run: make quickbench
 
+      - name: One-click launcher + verification.py
+        run: make clean && python3 run_project.py build && python3 verification.py
+
   macos:
     name: macOS · Apple clang + libomp — build and tests
     runs-on: macos-latest
@@ -63,3 +66,30 @@ jobs:
 
       - name: Quick benchmark
         run: make quickbench
+
+      - name: One-click launcher + verification.py
+        run: make clean && python3 run_project.py build && python3 verification.py
+
+  windows:
+    name: Windows · MinGW-w64 GCC — launcher, verification
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-python-numpy
+
+      - name: Build with run_project.py (no make)
+        run: python run_project.py build
+
+      - name: verification.py
+        run: python verification.py

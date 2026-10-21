@@ -21,7 +21,7 @@ import csv
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIG_DIR = ROOT / "report" / "figures"
+FIG_DIR = ROOT / "reports" / "figures"
 
 
 def load(path: Path, schedule: str) -> dict[str, float]:

@@ -13,6 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef _WIN32
+#include <malloc.h>                     /* _aligned_malloc / _aligned_free */
+#endif
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -54,10 +57,24 @@ static void *ip_aligned_alloc(size_t bytes)
     if (rounded == 0) {
         rounded = IP_ALIGN;
     }
+#ifdef _WIN32
+    /* Windows (MinGW-w64 / MSVC) has no posix_memalign. */
+    ptr = _aligned_malloc(rounded, IP_ALIGN);
+#else
     if (posix_memalign(&ptr, IP_ALIGN, rounded) != 0) {
         return NULL;
     }
+#endif
     return ptr;
+}
+
+static void ip_aligned_free(void *ptr)
+{
+#ifdef _WIN32
+    _aligned_free(ptr);
+#else
+    free(ptr);
+#endif
 }
 
 /* ------------------------------------------------------------------ */
@@ -99,7 +116,7 @@ void image_free(Image *image)
     if (!image) {
         return;
     }
-    free(image->data);
+    ip_aligned_free(image->data);
     free(image);
 }
 
@@ -158,7 +175,7 @@ void tensor_free(Tensor *tensor)
     if (!tensor) {
         return;
     }
-    free(tensor->data);
+    ip_aligned_free(tensor->data);
     free(tensor);
 }
 

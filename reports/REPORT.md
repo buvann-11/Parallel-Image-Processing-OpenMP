@@ -674,6 +674,15 @@ programmatically (under Xvfb on a headless machine).
 
 ## 8. How to build and run
 
+**One click.** `RUN_LINUX_MAC.sh` (macOS/Linux) or `RUN_WINDOWS.bat` (Windows)
+opens a menu that builds, verifies, runs the demo and benchmark, and launches the
+GUI. Both call `run_project.py`, which compiles directly with the available
+OpenMP compiler, so `make` is not required. `python3 verification.py` runs every
+verification stage and prints one summary table. `START_HERE.md` and
+`REQUIREMENTS.md` give the details per operating system.
+
+**With make:**
+
 Requirements: a C99 compiler with OpenMP (GCC ≥ 4.9 or Clang with libomp), GNU
 make. Image decoding is vendored (stb), so there is nothing else to install. Python 3.8+ with Tkinter for the GUI; NumPy for cross-validation;
 Matplotlib for the figures. None of these are needed to build or run the C code.

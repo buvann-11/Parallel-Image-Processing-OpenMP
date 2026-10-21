@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render report/REPORT.md to report/REPORT.pdf.
+"""Render reports/REPORT.md to reports/REPORT.pdf.
 
 MTCS-103P High Performance Computing Laboratory -- Mini Project
 
@@ -9,7 +9,7 @@ table and re-running the benchmarks on your own machine):
     python3 tools/make_report_pdf.py
 
 Needs `markdown` (pip install markdown) and one of `wkhtmltopdf` or `pandoc`.
-If neither is available the script still writes report/REPORT.html, which any
+If neither is available the script still writes reports/REPORT.html, which any
 browser can print to PDF.
 """
 
@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REPORT_DIR = ROOT / "report"
+REPORT_DIR = ROOT / "reports"
 MD_PATH = REPORT_DIR / "REPORT.md"
 # The HTML is written NEXT TO the markdown, not in a temp directory, so the
 # relative figures/*.png links resolve when the PDF renderer loads it.

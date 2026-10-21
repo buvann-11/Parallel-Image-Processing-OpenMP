@@ -7,7 +7,7 @@ Run `make demo` first to produce data/demo/, then:
 
     python3 tools/make_contact_sheets.py
 
-Writes report/figures/results_part1.png and results_part2.png.  Needs
+Writes reports/figures/results_part1.png and results_part2.png.  Needs
 matplotlib; the PPM reader is borrowed from the verification tool so this
 script adds no new image dependency.
 """
@@ -43,7 +43,7 @@ sheet([("input","00_input.ppm"),
        ("conv: laplacian","18_conv_laplacian.ppm"),
        ("conv: sharpen","19_conv_sharpen.ppm")],
       "Part 1 -- CNN primitives: padding, pooling, convolution",
-      "report/figures/results_part1.png", 4)
+      "reports/figures/results_part1.png", 4)
 
 sheet([("input","00_input.ppm"),
        ("grey: BT.601","20_gray_bt601.pgm"),
@@ -58,5 +58,5 @@ sheet([("input","00_input.ppm"),
        ("resize: bicubic","42_resize_bicubic.ppm"),
        ("resize: NO anti-alias","43_resize_noaa.ppm")],
       "Part 2 -- Image processing: greyscale, normalisation, resizing",
-      "report/figures/results_part2.png", 4)
+      "reports/figures/results_part2.png", 4)
 print("contact sheets written")

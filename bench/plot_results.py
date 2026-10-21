@@ -3,7 +3,7 @@
 
 MTCS-103P High Performance Computing Laboratory -- Mini Project
 
-Produces four figures in report/figures/:
+Produces four figures in reports/figures/:
 
   1. speedup.png       S(p) for every kernel, against the ideal S = p line.
   2. efficiency.png    E(p) = S(p)/p.  Where a curve falls away shows where
@@ -30,7 +30,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CSV_PATH = ROOT / "results" / "scaling.csv"
-FIG_DIR = ROOT / "report" / "figures"
+FIG_DIR = ROOT / "reports" / "figures"
 
 
 def load(path: Path) -> list[dict]:

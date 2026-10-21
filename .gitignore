@@ -19,4 +19,5 @@ __pycache__/
 /out*.p?m
 /out*.png
 /out*.jpg
-/report/REPORT.html
+/reports/REPORT.html
+/outputs/
