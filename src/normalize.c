@@ -186,10 +186,23 @@ static void histogram_omp(const float *data, long n, long *hist)
         long *mine = local + (size_t)omp_get_thread_num() * HIST_STRIDE;
         long k;
 
-        /* No atomics here: `mine` is this thread's own padded slab. */
+        /* No atomics here: `mine` is this thread's own padded slab.
+         *
+         * The increment goes through a volatile lvalue on purpose.  Apple
+         * clang 21 (Xcode 26) at -O2 and above miscompiles this exact
+         * pattern -- a schedule(runtime) loop scattering increments into a
+         * per-thread array -- and silently drops counts: on a 96x96x3 test
+         * image, 27,648 pixels produced a histogram summing to 19,633.  It
+         * is deterministic, so it is not a race, and GCC, Apple clang at
+         * -O0/-O1 and every other kernel are unaffected.  Forcing each
+         * increment to be a real load and store removes the bad transform
+         * and costs nothing measurable: the loop is a read-modify-write of
+         * memory either way.  Found by the macOS CI job via the
+         * serial == OpenMP test; see report section 6.6. */
 #pragma omp for schedule(runtime)
         for (k = 0; k < n; ++k) {
-            mine[bin_of(data[k])]++;
+            volatile long *slot = &mine[bin_of(data[k])];
+            *slot += 1;
         }
     }
 

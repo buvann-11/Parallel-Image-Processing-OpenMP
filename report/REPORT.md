@@ -602,6 +602,33 @@ Every push runs `.github/workflows/ci.yml` on GitHub Actions: build with
 CLI tests, the NumPy cross-validation, the OpenMP-disabled control build, ASan
 and TSan.
 
+### 6.6 A compiler bug found by the serial == OpenMP test
+
+The macOS CI job failed exactly one assertion: histogram equalisation gave
+different output from the serial and OpenMP paths. Every other kernel passed,
+and the OpenMP output was identical at 1–4 threads — so it was deterministic,
+not a race.
+
+Narrowing it down on the CI machine (Apple clang 21, Homebrew libomp 23):
+
+| Variant of the per-thread histogram loop | Counts recorded (expect 27,648) |
+|---|---|
+| GCC 14, `-O3` | 27,648 |
+| Apple clang, `-O0` / `-O1` | 27,648 |
+| Apple clang, `-O2` / `-O3`, `schedule(runtime)` | **19,633** — counts lost |
+| Apple clang, `-O3`, `schedule(static)` | 27,648 |
+| Apple clang, `-O3`, increment through a `volatile` lvalue | 27,648 |
+
+So Apple clang's optimiser mishandles a `schedule(runtime)` loop that scatters
+increments into a per-thread array. The fix is one line: the increment in
+`histogram_omp` goes through a `volatile` pointer, which forces a genuine
+load–store per pixel (what the loop does anyway) and blocks the bad
+transformation. It costs nothing measurable on Linux.
+
+This is the clearest demonstration in the project of why the
+serial == OpenMP test exists: the code was correct, the compiler was not,
+and only an exact comparison on a second toolchain exposed it.
+
 ---
 
 ## 7. Graphical interface
