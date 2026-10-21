@@ -334,6 +334,7 @@ int main(int argc, char **argv)
     ip_status status = IP_OK;
     Image *input = NULL, *result = NULL;
     Tensor *tensor_result = NULL;
+    Tensor *in_tensor = NULL;
     Timing timing;
     char detail[128];
     int rc = 0, r, threads;
@@ -488,6 +489,11 @@ int main(int argc, char **argv)
                    image_free, result);
 
     } else if (strcmp(command, "resize") == 0) {
+        if (o.size_h < 1 || o.size_w < 1) {
+            fprintf(stderr, "error: --size needs two positive values\n");
+            rc = 2;
+            goto done;
+        }
         snprintf(detail, sizeof(detail), "%s %dx%d%s",
                  resize_method_name(o.resize), o.size_h, o.size_w,
                  o.antialias ? "" : " no-aa");
@@ -508,7 +514,21 @@ int main(int argc, char **argv)
                    image_free, result);
 
     } else if (strcmp(command, "pad") == 0 || strcmp(command, "pool") == 0) {
-        Tensor *in_tensor = image_to_tensor(input);
+        if (strcmp(command, "pad") == 0 && o.amount < 0) {
+            fprintf(stderr, "error: --amount must be >= 0\n");
+            rc = 2;
+            goto done;
+        }
+        if (strcmp(command, "pool") == 0 &&
+            (o.pool_size < 1 || o.pool_stride < 1 ||
+             o.pool_size > input->height || o.pool_size > input->width)) {
+            fprintf(stderr, "error: pooling window %d (stride %d) does not fit "
+                    "a %d x %d image\n", o.pool_size, o.pool_stride,
+                    input->height, input->width);
+            rc = 2;
+            goto done;
+        }
+        in_tensor = image_to_tensor(input);
         if (!in_tensor) {
             fprintf(stderr, "error: out of memory\n");
             rc = 1;
@@ -531,6 +551,7 @@ int main(int argc, char **argv)
                        tensor_free, tensor_result);
         }
         tensor_free(in_tensor);
+        in_tensor = NULL;
         if (tensor_result) {
             result = tensor_to_image(tensor_result);
         }
@@ -558,6 +579,7 @@ int main(int argc, char **argv)
     report(&o, command, detail, &timing, result, tensor_result);
 
 done:
+    tensor_free(in_tensor);
     image_free(input);
     image_free(result);
     tensor_free(tensor_result);

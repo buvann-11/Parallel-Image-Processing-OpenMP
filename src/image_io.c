@@ -110,6 +110,21 @@ Image *image_read_netpbm(const char *path, ip_status *status)
      * the first pixel. */
 
     count = (size_t)width * height * channels;
+
+    /* Never trust the header's dimensions: a truncated or malicious file can
+     * claim 99999 x 99999 and make us try to allocate tens of gigabytes.
+     * Check that the file really holds that many bytes before allocating. */
+    {
+        long here = ftell(fp);
+        long end;
+        if (here < 0 || fseek(fp, 0, SEEK_END) != 0 || (end = ftell(fp)) < 0 ||
+            (unsigned long)(end - here) < (unsigned long)count ||
+            fseek(fp, here, SEEK_SET) != 0) {
+            if (status) *status = IP_ERR_FORMAT;
+            goto fail;
+        }
+    }
+
     raw = (unsigned char *)malloc(count);
     if (!raw) {
         if (status) *status = IP_ERR_ALLOC;

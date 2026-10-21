@@ -31,7 +31,7 @@ against an independent implementation, race-checked, and measured.
 | Language | C99 + OpenMP; image codecs from the vendored, public-domain [stb](https://github.com/nothings/stb) headers |
 | Operations | 9, each with a directive-free serial baseline *and* an OpenMP version |
 | Image formats | PPM/PGM natively; PNG, JPEG, BMP, TGA via stb |
-| Correctness | 27 C tests (**41,119 assertions**) + 16 end-to-end CLI checks, all passing |
+| Correctness | 27 C tests (**41,119 assertions**) + 20 end-to-end CLI checks, all passing |
 | Cross-validation | **20/20** checks against an independent NumPy implementation, most bit-exact |
 | Race freedom | ThreadSanitizer + Archer: **no races**; output bit-identical at every thread count and schedule |
 | Memory safety | AddressSanitizer + UBSan: clean |
@@ -142,7 +142,7 @@ Common options: `--threads N`, `--schedule static|dynamic|guided`, `--repeat N`,
 ## Verifying correctness
 
 ```bash
-make test       # 27 C tests (41,119 assertions) + 16 CLI / image-format checks
+make test       # 27 C tests (41,119 assertions) + 20 CLI / image-format checks
 make verify     # cross-check against the NumPy reference (needs NumPy)
 make serial     # build with OpenMP disabled, as a control
 make asan       # AddressSanitizer + UndefinedBehaviorSanitizer
@@ -251,7 +251,7 @@ in §4 of the report rather than quietly kept.
 ├── gui/app.py                   Tkinter front-end (operations + test runner)
 ├── tests/
 │   ├── test_correctness.c       27 tests, 41,119 assertions
-│   ├── test_cli.sh              16 end-to-end CLI / image-format checks
+│   ├── test_cli.sh              20 end-to-end CLI / image-format checks
 │   └── tsan.supp                ThreadSanitizer suppressions (runtime only)
 ├── bench/                       strong-scaling harness and plotting
 ├── reports/                     the two reports (PDF + Markdown) and their figures

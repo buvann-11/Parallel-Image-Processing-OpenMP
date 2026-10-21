@@ -7,6 +7,8 @@
 # shipped binary the way a user drives it:
 #   * PNG/BMP/TGA round-trips are lossless and agree byte-for-byte with PPM,
 #   * JPEG decodes to the right shape (it is lossy, so only that),
+#   * hostile input (oversized headers, corrupt files, impossible window or
+#     output sizes) is rejected cleanly instead of crashing,
 #   * every operation gives identical output from a PPM and a PNG input,
 #   * the CLI output is identical at 1, 2 and 4 threads and under all three
 #     schedules -- the end-to-end version of the race check.
@@ -54,6 +56,27 @@ if "$BIN" convert "$TMP/in.ppm" "$TMP/out.xyz" --quiet 2>/dev/null; then
 else
     ok "unknown output extension is rejected"
 fi
+
+# ---- hostile and invalid input is rejected without crashing --------------
+printf 'P6\n99999 99999\n255\nxx' > "$TMP/huge.ppm"
+if "$BIN" conv "$TMP/huge.ppm" "$TMP/o.ppm" --quiet 2>/dev/null; then
+    bad "header claiming 99999x99999 on a tiny file is rejected"
+else
+    ok "header claiming 99999x99999 on a tiny file is rejected"
+fi
+printf 'not an image' > "$TMP/junk.png"
+if "$BIN" conv "$TMP/junk.png" "$TMP/o.ppm" --quiet 2>/dev/null; then
+    bad "corrupt PNG is rejected"
+else
+    ok "corrupt PNG is rejected"
+fi
+"$BIN" gen "$TMP/tiny.ppm" --size 5 --quiet
+rc=0; "$BIN" pool "$TMP/tiny.ppm" "$TMP/o.ppm" --size 8 --stride 8 --quiet 2>/dev/null || rc=$?
+if [ "$rc" -eq 2 ]; then ok "pooling window larger than the image is a usage error"
+else bad "pooling window larger than the image is a usage error (rc=$rc)"; fi
+rc=0; "$BIN" resize "$TMP/tiny.ppm" "$TMP/o.ppm" --size 0 4 --quiet 2>/dev/null || rc=$?
+if [ "$rc" -eq 2 ]; then ok "resize to zero size is a usage error"
+else bad "resize to zero size is a usage error (rc=$rc)"; fi
 
 # ---- every operation: PPM input == PNG input ------------------------------
 "$BIN" convert "$TMP/in.ppm" "$TMP/in.png" --quiet

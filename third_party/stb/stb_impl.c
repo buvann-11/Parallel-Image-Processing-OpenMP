@@ -19,6 +19,7 @@
 #define STBI_NO_HDR
 #define STBI_NO_LINEAR
 #define STBI_FAILURE_USERMSG
+#define STBI_MAX_DIMENSIONS (1 << 15)   /* reject absurd headers before allocating */
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
