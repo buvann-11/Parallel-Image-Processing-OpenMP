@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MD = ROOT / "reports" / "REPORT.md"
 PDF = ROOT / "reports" / "REPORT.pdf"
 TEAM = [("26010303001", "B. Sai Buvann"), ("26010303004", "M. Sai Praneeth")]
-TEAM_LINE = ", ".join(f"{name} ({reg})" for reg, name in TEAM)
+COVER = "**MTCS-103P — High Performance Computing Laboratory · Mini Project**"
 
 
 def render() -> None:
@@ -31,9 +31,9 @@ def main() -> int:
     try:
         for reg, name in TEAM:
             MD.write_text(original.replace(
-                "**Mini Project Report**",
-                f"**Mini Project Report**\n\n**Submitted by:** {name} — "
-                f"Registration no. {reg}  \n**Team:** {TEAM_LINE}", 1),
+                COVER,
+                f"{COVER}\n\n**Submitted by:** {name} — "
+                f"Registration no. {reg}", 1),
                 encoding="utf-8")
             render()
             target = ROOT / "reports" / f"{reg}_Report.pdf"

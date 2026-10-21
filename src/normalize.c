@@ -198,7 +198,7 @@ static void histogram_omp(const float *data, long n, long *hist)
          * increment to be a real load and store removes the bad transform
          * and costs nothing measurable: the loop is a read-modify-write of
          * memory either way.  Found by the macOS CI job via the
-         * serial == OpenMP test; see report section 6.6. */
+         * serial == OpenMP test; see report section 5. */
 #pragma omp for schedule(runtime)
         for (k = 0; k < n; ++k) {
             volatile long *slot = &mine[bin_of(data[k])];

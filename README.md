@@ -177,7 +177,7 @@ make results    # scaling study + chunk-size experiment + all figures + PDF
 ```
 
 The harness detects the core count and sweeps powers of two up to it. The numbers
-in the report were measured on a 2-core machine; see §5 of the report.
+in the report were measured on a 2-core machine; see §4 of the report.
 
 ---
 
@@ -201,7 +201,7 @@ early version reported 15× speedup on 2 cores. That was a methodology bug: the
 "serial" baseline used `#pragma omp parallel for ... if(0)`, and GCC still emits
 the full libgomp loop protocol when the condition is false — inflating every
 speedup roughly 7×. Both that and the remaining superlinear results are documented
-in §5.6 of the report rather than quietly kept.
+in §4 of the report rather than quietly kept.
 
 ---
 

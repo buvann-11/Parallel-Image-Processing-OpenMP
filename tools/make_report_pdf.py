@@ -29,29 +29,29 @@ HTML_PATH = REPORT_DIR / "REPORT.html"
 PDF_PATH = REPORT_DIR / "REPORT.pdf"
 
 CSS = """
-@page { size: A4; margin: 18mm 16mm; }
+@page { size: A4; }
 body { font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
-       font-size: 10.5pt; line-height: 1.45; color: #111; }
-h1 { font-size: 19pt; border-bottom: 2px solid #333; padding-bottom: 6px; }
-h2 { font-size: 14pt; margin-top: 22px; border-bottom: 1px solid #bbb;
+       font-size: 12pt; line-height: 1.4; color: #111; }
+h1 { font-size: 21pt; border-bottom: 2px solid #333; padding-bottom: 6px;
+     margin-bottom: 8px; }
+h2 { font-size: 16pt; margin-top: 18px; break-after: avoid; border-bottom: 1px solid #bbb;
      padding-bottom: 3px; page-break-after: avoid; }
-h3 { font-size: 11.5pt; margin-top: 16px; page-break-after: avoid; }
-h4 { font-size: 10.5pt; margin-top: 12px; page-break-after: avoid; }
-table { border-collapse: collapse; width: 100%; margin: 10px 0;
-        font-size: 9pt; page-break-inside: avoid; }
+h3 { font-size: 13.5pt; margin-top: 14px; page-break-after: avoid; }
+p, li { margin: 4px 0; }
+ul, ol { margin: 4px 0 6px 0; padding-left: 22px; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0;
+        font-size: 11pt; page-break-inside: avoid; }
 th, td { border: 1px solid #999; padding: 4px 6px; text-align: left;
          vertical-align: top; }
 th { background: #eee; }
-code { font-family: 'DejaVu Sans Mono', monospace; font-size: 9pt;
-       background: #f4f4f4; padding: 1px 3px; }
+code { font-family: 'DejaVu Sans Mono', monospace; font-size: 10.5pt;
+       background: #f4f4f4; padding: 0 3px; }
 pre { background: #f6f6f6; border: 1px solid #ddd; padding: 8px;
-      overflow-x: auto; page-break-inside: avoid; }
-pre code { background: none; font-size: 8.5pt; }
-img { max-width: 100%; page-break-inside: avoid; display: block;
-      margin: 12px auto; border: 1px solid #ddd; }
-blockquote { border-left: 4px solid #d0a000; background: #fffbe8;
-             margin: 10px 0; padding: 8px 12px; }
-hr { border: none; border-top: 1px solid #ccc; margin: 18px 0; }
+      page-break-inside: avoid; }
+pre code { background: none; font-size: 10.5pt; }
+img { width: 100%; max-width: 100%; break-inside: avoid; page-break-inside: avoid; display: block;
+      margin: 10px auto; border: 1px solid #ddd; }
+hr { border: none; border-top: 1px solid #ccc; margin: 14px 0; }
 """
 
 
@@ -74,9 +74,41 @@ def build_html() -> None:
     print(f"  wrote {HTML_PATH.relative_to(ROOT)}")
 
 
+def build_pdf_chromium() -> bool:
+    """Chromium (via Playwright) honours the print CSS exactly and keeps PNG
+    figures lossless, so it is preferred when available."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return False
+    try:
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch()
+            page = browser.new_page()
+            page.goto(HTML_PATH.resolve().as_uri(), wait_until="networkidle")
+            page.pdf(path=str(PDF_PATH), format="A4", print_background=True,
+                     margin={"top": "13mm", "bottom": "13mm",
+                             "left": "14mm", "right": "14mm"},
+                     display_header_footer=True,
+                     header_template="<span></span>",
+                     footer_template=(
+                         "<div style='font-size:8pt;width:100%;text-align:center;"
+                         "color:#777'><span class='pageNumber'></span> / "
+                         "<span class='totalPages'></span></div>"))
+            browser.close()
+        return PDF_PATH.is_file()
+    except Exception as exc:  # fall back to the other renderers
+        print(f"  chromium failed: {str(exc)[:200]}")
+        return False
+
+
 def build_pdf() -> bool:
+    if build_pdf_chromium():
+        return True
     if shutil.which("wkhtmltopdf"):
         cmd = ["wkhtmltopdf", "--quiet", "--enable-local-file-access",
+               "--image-quality", "100", "--image-dpi", "600",
+               "--title", "MTCS-103P Mini Project Report",
                "--page-size", "A4",
                "--margin-top", "16mm", "--margin-bottom", "16mm",
                "--margin-left", "14mm", "--margin-right", "14mm",
