@@ -52,7 +52,14 @@ jobs:
         run: make -j"$(sysctl -n hw.ncpu)" EXTRA_CFLAGS=-Werror
 
       - name: C correctness suite + CLI / image-format tests
-        run: make test
+        run: |
+          set -o pipefail
+          make test 2>&1 | tee test.log || {
+            # Surface failure details as annotations, visible on the run page.
+            grep -E "FAILED|differs|first difference" test.log |
+              while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
 
       - name: Quick benchmark
         run: make quickbench
