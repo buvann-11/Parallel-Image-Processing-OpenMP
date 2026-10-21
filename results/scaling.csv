@@ -1,0 +1,61 @@
+kernel,note,size,schedule,threads,serial_ms,omp_ms,speedup,efficiency,karp_flatt
+grayscale,"elementwise map, memory bound",1024,static,1,0.600892,0.641197,0.937141,0.937141,0.000000
+grayscale,"elementwise map, memory bound",1024,static,2,0.600892,0.321887,1.866779,0.933390,0.071364
+grayscale_gamma,"elementwise map with powf, compute bound",1024,static,1,36.122544,36.145005,0.999379,0.999379,0.000000
+grayscale_gamma,"elementwise map with powf, compute bound",1024,static,2,36.122544,18.122302,1.993265,0.996632,0.003379
+norm_minmax,"min/max reduction + map",1024,static,1,5.949939,5.623580,1.058034,1.058034,0.000000
+norm_minmax,"min/max reduction + map",1024,static,2,5.949939,2.774704,2.144351,1.072175,-0.067317
+norm_equalize,"private histograms + LUT map",1024,static,1,6.568602,7.333065,0.895751,0.895751,0.000000
+norm_equalize,"private histograms + LUT map",1024,static,2,6.568602,4.290794,1.530859,0.765430,0.306456
+resize_bicubic,"two separable passes, barrier between",1024,static,1,16.910767,19.283373,0.876961,0.876961,0.000000
+resize_bicubic,"two separable passes, barrier between",1024,static,2,16.910767,10.801330,1.565619,0.782809,0.277450
+pad_reflect,"pure gather, bandwidth bound",1024,static,1,2.098917,1.583849,1.325200,1.325200,0.000000
+pad_reflect,"pure gather, bandwidth bound",1024,static,2,2.098917,0.614285,3.416846,1.708423,-0.414665
+pool_max_2x2,"windowed reduction, bandwidth bound",1024,static,1,3.568190,3.148600,1.133262,1.133262,0.000000
+pool_max_2x2,"windowed reduction, bandwidth bound",1024,static,2,3.568190,1.530851,2.330854,1.165427,-0.141945
+conv_3x3,"depthwise image filter",1024,static,1,27.949200,26.124979,1.069827,1.069827,0.000000
+conv_3x3,"depthwise image filter",1024,static,2,27.949200,14.026619,1.992583,0.996291,0.003722
+conv_5x5,"depthwise image filter, more arithmetic",1024,static,1,75.510390,69.131737,1.092268,1.092268,0.000000
+conv_5x5,"depthwise image filter, more arithmetic",1024,static,2,75.510390,35.667659,2.117055,1.058527,-0.055291
+conv_cnn_16ch,"multi-channel CNN convolution, compute bound",1024,static,1,90.378624,93.442295,0.967213,0.967213,0.000000
+conv_cnn_16ch,"multi-channel CNN convolution, compute bound",1024,static,2,90.378624,46.351803,1.949841,0.974920,0.025725
+grayscale,"elementwise map, memory bound",1024,dynamic,1,0.600892,15.705690,0.038260,0.038260,0.000000
+grayscale,"elementwise map, memory bound",1024,dynamic,2,0.600892,58.684645,0.010239,0.005120,194.325100
+grayscale_gamma,"elementwise map with powf, compute bound",1024,dynamic,1,36.122544,73.012001,0.494748,0.494748,0.000000
+grayscale_gamma,"elementwise map with powf, compute bound",1024,dynamic,2,36.122544,80.079241,0.451085,0.225542,3.433754
+norm_minmax,"min/max reduction + map",1024,dynamic,1,5.949939,76.470458,0.077807,0.077807,0.000000
+norm_minmax,"min/max reduction + map",1024,dynamic,2,5.949939,404.307169,0.014716,0.007358,134.902963
+norm_equalize,"private histograms + LUT map",1024,dynamic,1,6.568602,106.052560,0.061937,0.061937,0.000000
+norm_equalize,"private histograms + LUT map",1024,dynamic,2,6.568602,272.840997,0.024075,0.012037,82.074297
+resize_bicubic,"two separable passes, barrier between",1024,dynamic,1,16.910767,18.808111,0.899121,0.899121,0.000000
+resize_bicubic,"two separable passes, barrier between",1024,dynamic,2,16.910767,9.989169,1.692910,0.846455,0.181398
+pad_reflect,"pure gather, bandwidth bound",1024,dynamic,1,2.098917,1.721874,1.218972,1.218972,0.000000
+pad_reflect,"pure gather, bandwidth bound",1024,dynamic,2,2.098917,1.130056,1.857357,0.928678,0.076799
+pool_max_2x2,"windowed reduction, bandwidth bound",1024,dynamic,1,3.568190,3.171472,1.125090,1.125090,0.000000
+pool_max_2x2,"windowed reduction, bandwidth bound",1024,dynamic,2,3.568190,1.630773,2.188036,1.094018,-0.085938
+conv_3x3,"depthwise image filter",1024,dynamic,1,27.949200,25.782363,1.084043,1.084043,0.000000
+conv_3x3,"depthwise image filter",1024,dynamic,2,27.949200,13.519023,2.067398,1.033699,-0.032600
+conv_5x5,"depthwise image filter, more arithmetic",1024,dynamic,1,75.510390,68.918196,1.095652,1.095652,0.000000
+conv_5x5,"depthwise image filter, more arithmetic",1024,dynamic,2,75.510390,35.634442,2.119028,1.059514,-0.056171
+conv_cnn_16ch,"multi-channel CNN convolution, compute bound",1024,dynamic,1,90.378624,88.065688,1.026264,1.026264,0.000000
+conv_cnn_16ch,"multi-channel CNN convolution, compute bound",1024,dynamic,2,90.378624,56.406535,1.602272,0.801136,0.248227
+grayscale,"elementwise map, memory bound",1024,guided,1,0.600892,0.603523,0.995641,0.995641,0.000000
+grayscale,"elementwise map, memory bound",1024,guided,2,0.600892,0.280043,2.145713,1.072857,-0.067909
+grayscale_gamma,"elementwise map with powf, compute bound",1024,guided,1,36.122544,35.897990,1.006255,1.006255,0.000000
+grayscale_gamma,"elementwise map with powf, compute bound",1024,guided,2,36.122544,18.122488,1.993244,0.996622,0.003389
+norm_minmax,"min/max reduction + map",1024,guided,1,5.949939,5.512645,1.079326,1.079326,0.000000
+norm_minmax,"min/max reduction + map",1024,guided,2,5.949939,2.595345,2.292543,1.146271,-0.127606
+norm_equalize,"private histograms + LUT map",1024,guided,1,6.568602,7.169880,0.916138,0.916138,0.000000
+norm_equalize,"private histograms + LUT map",1024,guided,2,6.568602,4.187454,1.568639,0.784319,0.274991
+resize_bicubic,"two separable passes, barrier between",1024,guided,1,16.910767,18.671022,0.905723,0.905723,0.000000
+resize_bicubic,"two separable passes, barrier between",1024,guided,2,16.910767,9.002959,1.878357,0.939178,0.064761
+pad_reflect,"pure gather, bandwidth bound",1024,guided,1,2.098917,1.202992,1.744747,1.744747,0.000000
+pad_reflect,"pure gather, bandwidth bound",1024,guided,2,2.098917,0.515927,4.068244,2.034122,-0.508387
+pool_max_2x2,"windowed reduction, bandwidth bound",1024,guided,1,3.568190,3.072864,1.161194,1.161194,0.000000
+pool_max_2x2,"windowed reduction, bandwidth bound",1024,guided,2,3.568190,1.514729,2.355662,1.177831,-0.150982
+conv_3x3,"depthwise image filter",1024,guided,1,27.949200,25.721989,1.086588,1.086588,0.000000
+conv_3x3,"depthwise image filter",1024,guided,2,27.949200,13.012631,2.147852,1.073926,-0.068837
+conv_5x5,"depthwise image filter, more arithmetic",1024,guided,1,75.510390,68.486028,1.102566,1.102566,0.000000
+conv_5x5,"depthwise image filter, more arithmetic",1024,guided,2,75.510390,35.044250,2.154716,1.077358,-0.071803
+conv_cnn_16ch,"multi-channel CNN convolution, compute bound",1024,guided,1,90.378624,86.358581,1.046551,1.046551,0.000000
+conv_cnn_16ch,"multi-channel CNN convolution, compute bound",1024,guided,2,90.378624,44.443993,2.033540,1.016770,-0.016493

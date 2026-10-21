@@ -1,0 +1,13 @@
+# ThreadSanitizer suppressions for `make tsan`.
+#
+# The tsan target builds with clang + LLVM libomp and loads Archer, LLVM's
+# OpenMP tool that tells TSan about OpenMP's barriers and task edges.  That
+# removes the flood of false positives GCC's uninstrumented libgomp causes.
+#
+# What remains is one benign report inside libomp itself (its lazy
+# pthread_mutex_init of an internal lock).  Only interceptor calls made FROM
+# the OpenMP runtime are suppressed -- a race in our code still reports,
+# because the racing access is in our frames.
+called_from_lib:libomp.so
+called_from_lib:libomp.so.5
+called_from_lib:libomp.dylib

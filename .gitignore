@@ -1,0 +1,22 @@
+# build output
+/build/
+/bin/
+*.o
+*.dSYM/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# scratch output from ad-hoc CLI runs
+/out*.p?m
+/out*.png
+/out*.jpg
+/report/REPORT.html

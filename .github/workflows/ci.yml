@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    name: Linux · GCC — build, tests, verify, sanitizers
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang-18 libomp-18-dev libclang-rt-18-dev
+          python3 -m pip install --quiet numpy
+
+      - name: Build (warnings are errors)
+        run: make -j"$(nproc)" EXTRA_CFLAGS=-Werror
+
+      - name: C correctness suite + CLI / image-format tests
+        run: make test
+
+      - name: Cross-validate against the NumPy reference
+        run: make verify
+
+      - name: OpenMP-disabled control build
+        run: make serial EXTRA_CFLAGS=-Werror && ./bin/imgproc_serial info
+
+      - name: AddressSanitizer + UndefinedBehaviorSanitizer
+        run: make asan
+
+      - name: ThreadSanitizer + Archer (data-race detection)
+        run: make tsan TSAN_CC=clang-18
+
+      - name: Quick benchmark
+        run: make quickbench
+
+  macos:
+    name: macOS · Apple clang + libomp — build and tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install libomp
+        run: brew install libomp
+
+      - name: Build (warnings are errors)
+        run: make -j"$(sysctl -n hw.ncpu)" EXTRA_CFLAGS=-Werror
+
+      - name: C correctness suite + CLI / image-format tests
+        run: make test
+
+      - name: Quick benchmark
+        run: make quickbench

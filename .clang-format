@@ -1,0 +1,9 @@
+# Matches the existing style of src/ (K&R braces, 4-space indent, 80 columns).
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 80
+BreakBeforeBraces: Linux
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: WithoutElse
+PointerAlignment: Right
+SortIncludes: Never
